@@ -1,0 +1,52 @@
+from pathlib import Path
+from typing import List
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+_ENV_FILE = _PROJECT_ROOT / ".env"
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=[str(_ENV_FILE), ".env"],
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+    )
+
+    PROJECT_NAME: str = "video-subtitle-process"
+    VERSION: str = "0.1.0"
+    API_V1_PREFIX: str = "/api/v1"
+
+    ENV: str = Field(default="dev")
+    DEBUG: bool = Field(default=False)
+    PORT: int = Field(default=8000)
+
+    # Default to SQLite for development (change in production)
+
+    DATABASE_URL: str = Field(default="sqlite://./video_subtitle_process.db")
+
+
+    REDIS_URL: str = Field(default="redis://localhost:6379/0")
+    REDIS_MAX_CONNECTIONS: int = Field(default=10)
+
+    # CHANGE THIS IN PRODUCTION!
+    JWT_SECRET_KEY: str = Field(default="dev-secret-key-change-in-production")
+    JWT_ALGORITHM: str = Field(default="HS256")
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30)
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7)
+
+    CORS_ORIGINS: str = Field(default="")
+
+    LOG_LEVEL: str = Field(default="INFO")
+    LOG_FORMAT: str = Field(default="json")
+
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        if not self.CORS_ORIGINS:
+            return []
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+
+
+settings = Settings()
