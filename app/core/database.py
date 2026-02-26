@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Optional
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
@@ -67,3 +68,13 @@ class Database(Singleton):
 
 
 db = Database()
+
+
+@asynccontextmanager
+async def db_lifespan():
+    """Celery Worker 用的数据库连接生命周期，与 FastAPI lifespan 共用同一份配置。"""
+    await db.connect()
+    try:
+        yield
+    finally:
+        await db.disconnect()

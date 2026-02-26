@@ -25,10 +25,13 @@ InvalidCredentials = AppError(40001, "Invalid username or password")
 InvalidToken = AppError(40002, "Invalid or expired token")
 PermissionDenied = AppError(40003, "Permission denied")
 UserAlreadyExists = AppError(40004, "User already exists")
+TaskAlreadyExists = AppError(40005, "Task already exists")
+TaskAlreadyFinished = AppError(40006, "Task is already in terminal state")
 
 # 404xx - Not found
 NotFound = AppError(40401, "Resource not found")
 UserNotFound = AppError(40402, "User not found")
+TaskNotFound = AppError(40403, "Task not found")
 
 # 500xx - Server errors
 InternalError = AppError(50001, "Internal server error")
