@@ -15,11 +15,11 @@ class LLMClient(AsyncOpenAI):
             **kwargs,
     ):
         super().__init__(
-            api_key=api_key or settings.api_key,
-            base_url=base_url or settings.base_url,
+            api_key=api_key or settings.LLM_API_KEY,
+            base_url=base_url or settings.LLM_BASE_URI,
             **kwargs,
         )
-        self.default_model = settings.default_model
+        self.default_model = settings.DEFAULT_MODEL
 
     async def create_completion(
             self,

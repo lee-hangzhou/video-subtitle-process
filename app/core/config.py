@@ -53,14 +53,18 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO")
     LOG_FORMAT: str = Field(default="json")
 
-    alibaba: AlibabaSettings = Field(default_factory=AlibabaSettings)
-    quvideo: QuVideoSettings = Field(default_factory=QuVideoSettings)
+    ALIBABA: AlibabaSettings = Field(default_factory=AlibabaSettings)
+    QUVIDEO: QuVideoSettings = Field(default_factory=QuVideoSettings)
 
     CELERY_BROKER_URL: str = Field(default="redis://localhost:6379/1")
     CELERY_RESULT_BACKEND: str = Field(default="redis://localhost:6379/2")
 
     FFMPEG_WORKERS: int = Field(default=2)
     TMP_DIR: str = Field(default="/tmp/video-process")
+
+    LLM_API_KEY: str = Field(...)
+    LLM_BASE_URI: str = Field(default="https://openrouter.ai/api/v1")
+    DEFAULT_MODEL:str = Field(default="anthropic/claude-opus-4.6")
 
     @property
     def cors_origins_list(self) -> List[str]:

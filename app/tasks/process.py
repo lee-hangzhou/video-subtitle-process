@@ -84,6 +84,7 @@ class TaskProcessor:
                 language="ch" if language == "zh" else language,
                 extract_mode=ExtractMode.FPS,
                 include_secondary_subtitle=include_secondary,
+                filter_watermark=params.get("filter_watermark", False),
             ),
             asr_config=ASRConfig(
                 language="Chinese" if language == "zh" else language,
@@ -136,7 +137,7 @@ class TaskProcessor:
         """字幕擦除：提交所有视频到 QuVideo，将 job_id 列表写回 params。"""
         job_ids = []
         for local_path in local_paths:
-            oss_key = f"{settings.alibaba.oss_input_prefix}/{task.cloud_task_id}/{local_path.name}"
+            oss_key = f"{settings.ALIBABA.oss_input_prefix}/{task.cloud_task_id}/{local_path.name}"
             job_id = await subtitle_erase_service.upload_and_submit(local_path, oss_key)
             job_ids.append(job_id)
 
@@ -155,7 +156,7 @@ class TaskProcessor:
         """将本地输出文件上传到 OSS，返回 OSS key 列表。"""
         oss_keys = []
         for local_path in local_paths:
-            oss_key = f"{settings.alibaba.oss_output_prefix}/{cloud_task_id}/{local_path.name}"
+            oss_key = f"{settings.ALIBABA.oss_output_prefix}/{cloud_task_id}/{local_path.name}"
             await oss_client.upload_file(str(local_path), oss_key)
             oss_keys.append(oss_key)
         return oss_keys
@@ -206,7 +207,7 @@ class TaskProcessor:
                 tmp_path = Path(tmp.name)
             await self.subtitle_erase_service.download_result(data.task_result.video_url, tmp_path)
 
-            oss_key = f"{settings.alibaba.oss_output_prefix}/{task.cloud_task_id}/{job_id}.mp4"
+            oss_key = f"{settings.ALIBABA.oss_output_prefix}/{task.cloud_task_id}/{job_id}.mp4"
             await self.oss_client.upload_file(str(tmp_path), oss_key)
             os.remove(tmp_path)
             output_oss_keys.append(oss_key)

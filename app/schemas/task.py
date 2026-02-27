@@ -29,6 +29,7 @@ QUVIDEO_STATUS_MAP = {
 class ExtractParams(BaseModel):
     language: str = Field(default="zh", description="提取语言，同时影响 OCR 和 ASR")
     include_secondary_subtitle: bool = Field(default=False, description="是否包含副字幕")
+    filter_watermark: bool = Field(default=False, description="是否过滤水印区域")
 
 
 class EraseParams(BaseModel):

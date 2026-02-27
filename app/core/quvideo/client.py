@@ -16,8 +16,8 @@ from app.vars.constants import QUVIDEO_BASE_URL
 
 class QuVideo:
     def __init__(self):
-        self.ak = settings.quvideo.ak
-        self.sk = settings.quvideo.sk
+        self.ak = settings.QUVIDEO.ak
+        self.sk = settings.QUVIDEO.sk
         self.base_url = QUVIDEO_BASE_URL
 
     async def erase_subtitle(self, request: SubtitleEraseRequest) -> SubtitleEraseResponse:

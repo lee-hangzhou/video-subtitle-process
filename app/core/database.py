@@ -49,10 +49,14 @@ class Database(Singleton):
         url = db_url or settings.DATABASE_URL
         full_url = self._add_pool_params(url)
 
+        # _enable_global_fallback=True：将连接注册到全局变量而非 per-task contextvar。
+        # FastAPI lifespan 运行在独立后台 Task 中，HTTP 请求运行在不同 Task 里，
+        # 若不启用 global fallback，请求 Task 拿不到 lifespan Task 设置的连接。
         await Tortoise.init(
             db_url=full_url,
             modules={"models": ["app.models"]},
             use_tz=True,
+            _enable_global_fallback=True,
         )
 
         self._initialized = True

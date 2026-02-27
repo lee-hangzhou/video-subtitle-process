@@ -20,13 +20,12 @@ from app.vars.constants import VIDEO_FORMATS, PIXEL_TOLERANCE_X, PIXEL_TOLERANCE
     COORD_CLUSTER_EPS_X_WEIGHT, COORD_CLUSTER_EPS_MAX, COORD_CLUSTER_EPS_MIN, COORD_CLUSTER_MIN_SAMPLES, \
     COORD_CLUSTER_NOISE_MERGE_RATIO, WATERMARK_AREA_TOP_RATIO, WATERMARK_AREA_BOTTOM_RATIO, \
     WATERMARK_AREA_EDGE_TOP_RATIO, WATERMARK_AREA_EDGE_BOTTOM_RATIO, WATERMARK_INTERSECTION_AREA_RATIO, \
-    WATERMARK_SIZE_RATIO_THRESHOLD, WATERMARK_FRAME_RATIO_THRESHOLD, SCENE_TEXT_MIN_SAMPLES, SCENE_TEXT_EPS_MIN, \
-    SCENE_TEXT_EPS_MAX, SUBTITLE_MIN_DURATION
+    WATERMARK_SIZE_RATIO_THRESHOLD, WATERMARK_FRAME_RATIO_THRESHOLD, WATERMARK_SMALL_FRAME_RATIO_THRESHOLD, \
+    SCENE_TEXT_MIN_SAMPLES, SCENE_TEXT_EPS_MIN, SCENE_TEXT_EPS_MAX, SUBTITLE_MIN_DURATION, \
+    WATERMARK_TEXT_VARIETY_THRESHOLD
 
 # 禁用 oneDNN，避免 Windows 上 OneDnnContext/fused_conv2d 报错
 os.environ["FLAGS_use_mkldnn"] = "0"
-
-
 
 
 class OCRExtractor:
@@ -505,7 +504,8 @@ class OCRExtractor:
 
             # 文本判断：同一coord的文本是否固定
             texts = {s.text.strip() for s in subs}
-            text_fixed = len(texts) == 1
+
+            text_variety = len(texts) / len(subs)
 
             bbox_w = x_max - x_min
             bbox_h = y_max - y_min
@@ -517,7 +517,7 @@ class OCRExtractor:
             # 2. 不在高危区域，但满足频率和文本条件
             # 3. 尺寸太小
             if in_watermark_area or (
-                    not in_watermark_area and frame_ratio > WATERMARK_FRAME_RATIO_THRESHOLD and text_fixed) or is_small:
+                    not in_watermark_area and frame_ratio > WATERMARK_FRAME_RATIO_THRESHOLD and text_variety < WATERMARK_TEXT_VARIETY_THRESHOLD) or is_small:
                 watermark_coords.add(coord)
 
         return [

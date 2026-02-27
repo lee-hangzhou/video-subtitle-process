@@ -14,13 +14,13 @@ class OssClient:
             thread_name_prefix="oss_",
         )
         auth = oss2.Auth(
-            settings.alibaba.access_key_id,
-            settings.alibaba.access_key_secret,
+            settings.ALIBABA.access_key_id,
+            settings.ALIBABA.access_key_secret,
         )
         self.bucket = oss2.Bucket(
             auth,
-            settings.alibaba.oss_endpoint,
-            settings.alibaba.oss_bucket_name,
+            settings.ALIBABA.oss_endpoint,
+            settings.ALIBABA.oss_bucket_name,
         )
         atexit.register(self._shutdown)
 
