@@ -25,7 +25,7 @@ celery_app.conf.update(
     beat_schedule={
         "poll-erase-tasks": {
             "task": "app.tasks.process.poll_erase_tasks",
-            "schedule": 30.0,
+            "schedule": 60.0,
         },
     },
 )
