@@ -1,5 +1,6 @@
 import re
 import shutil
+import zipfile
 from pathlib import Path
 from typing import Optional
 
@@ -26,3 +27,16 @@ def copy_subtitle_files(input_dir: str, output_dir: str, suffix: str = "subtitle
         for file in sub_dir.iterdir():
             if file.is_file() and file.name.endswith(suffix):
                 shutil.copy(file, output_path / file.name)
+
+
+def zip_files(file_paths: list[Path], zip_path: Path) -> None:
+    """将多个本地文件打包为 zip。"""
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for p in file_paths:
+            zf.write(p, p.name)
+
+
+def unzip_file(zip_path: Path, dest_dir: Path) -> None:
+    """将 zip 解压到目标目录。"""
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        zf.extractall(dest_dir)

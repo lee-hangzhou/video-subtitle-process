@@ -20,7 +20,7 @@ class TaskService:
         task = await self.task_repo.create_task(
             cloud_task_id=req.cloud_task_id,
             task_type=req.task_type,
-            input_files=req.input_files,
+            input_file=req.input_file,
             params=req.params,
             callback_url=req.callback_url,
         )

@@ -11,7 +11,7 @@ class TaskRepository(BaseRepository[Task]):
             self,
             cloud_task_id: int,
             task_type: TaskType,
-            input_files: list[str],
+            input_file: str,
             params: dict = None,
             callback_url: str = None,
     ) -> Task:
@@ -19,7 +19,7 @@ class TaskRepository(BaseRepository[Task]):
         return await self.create(
             cloud_task_id=cloud_task_id,
             task_type=task_type,
-            input_files=input_files,
+            input_file=input_file,
             params=params,
             callback_url=callback_url,
         )
