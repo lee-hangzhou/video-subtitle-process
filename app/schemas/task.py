@@ -37,7 +37,7 @@ class EraseParams(BaseModel):
 
 
 class HardcodeParams(BaseModel):
-    subtitle_oss_key: str = Field(description="字幕文件 OSS key 列表，按文件名数字与 input_files 一一配对")
+    subtitle_oss_key: str = Field(description="字幕文件 OSS key，与 input_file 对应")
 
 
 class TranscodeParams(BaseModel):
