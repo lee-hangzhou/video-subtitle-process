@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-import traceback
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.logger import logger
@@ -58,27 +57,13 @@ async def http_error_handler(_request: Request, exc: StarletteHTTPException) -> 
 
 
 async def generic_error_handler(request: Request, exc: Exception) -> JSONResponse:
-    tb_str = traceback.format_exc()
-    tb_frames = traceback.extract_tb(exc.__traceback__)
-    if tb_frames:
-        frame = tb_frames[-1]
-        exc_location = {
-            "filename": frame.filename,
-            "module": frame.name,
-            "line": frame.lineno,
-        }
-    else:
-        exc_location = None
-
     logger.error(
         "unhandled_error",
         error_type=type(exc).__name__,
         error_message=str(exc),
         path=request.url.path,
         method=request.method,
-        traceback=tb_str,
-        exception_location=exc_location,
-        exc_info=True,
+        exc_info=exc,
     )
 
     return JSONResponse(
