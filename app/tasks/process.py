@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
 
@@ -35,7 +36,7 @@ class TaskProcessor:
         task = await self.task_repo.get_by_id(self.task_id)
         if not task:
             return
-        await self.task_repo.update(task.id, status=TaskStatus.PROCESSING)
+        await self.task_repo.update(task.id, status=TaskStatus.PROCESSING, started_at=datetime.now(timezone.utc))
         await self._execute(task)
 
     async def _execute(self, task: Task) -> None:
@@ -62,11 +63,12 @@ class TaskProcessor:
             output_files = await handler(task, input_dir, output_dir)
             output_oss_key = await self._upload_outputs(output_files, task.cloud_task_id)
 
-            await self.task_repo.update(task.id, status=TaskStatus.SUCCESS, output_file=output_oss_key)
+            now = datetime.now(timezone.utc)
+            await self.task_repo.update(task.id, status=TaskStatus.SUCCESS, output_file=output_oss_key, completed_at=now)
             await self.send_callback(task, TaskStatus.SUCCESS, output_oss_key)
 
         except Exception as e:
-            await self.task_repo.update(task.id, status=TaskStatus.FAILED, error_message=str(e))
+            await self.task_repo.update(task.id, status=TaskStatus.FAILED, error_message=str(e), completed_at=datetime.now(timezone.utc))
             await self.send_callback(task, TaskStatus.FAILED, error=str(e))
         finally:
             shutil.rmtree(work_dir, ignore_errors=True)
@@ -197,7 +199,7 @@ class TaskProcessor:
             try:
                 await self._poll_single(task)
             except Exception as e:
-                await self.task_repo.update(task.id, status=TaskStatus.FAILED, error_message=str(e))
+                await self.task_repo.update(task.id, status=TaskStatus.FAILED, error_message=str(e), completed_at=datetime.now(timezone.utc))
                 await self.send_callback(task, TaskStatus.FAILED, error=str(e))
 
     async def _poll_single(self, task: Task) -> None:
@@ -241,7 +243,7 @@ class TaskProcessor:
                 if p.exists():
                     os.remove(p)
 
-        await self.task_repo.update(task.id, status=TaskStatus.SUCCESS, output_file=output_oss_key)
+        await self.task_repo.update(task.id, status=TaskStatus.SUCCESS, output_file=output_oss_key, completed_at=datetime.now(timezone.utc))
         await self.send_callback(task, TaskStatus.SUCCESS, output_oss_key)
 
 
